@@ -19,6 +19,7 @@
     neovim
     wget
     git
+    screen
   ];
   environment.variables.EDITOR = "nvim";
 
@@ -180,6 +181,7 @@
         "/just-passing-through.lan.vasylenko.uk/192.168.10.1"
         "/router.vasylenko.uk/192.168.10.1"
       ];
+      cname = "*.vasylenko.uk,determinist.lan.vasylenko.uk";
     };
   };
 
