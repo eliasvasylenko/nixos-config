@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, hostName, ... }:
 
 {
   imports = [
@@ -6,6 +6,7 @@
 
     ../../users/eli.nix
 
+    ../../services/caddy.nix
     ../../services/ssh.nix
   ];
 
@@ -19,7 +20,6 @@
     neovim
     wget
     git
-    screen
   ];
   environment.variables.EDITOR = "nvim";
 
@@ -101,6 +101,8 @@
         chain input {
           type filter hook input priority 0; policy drop;
 
+          tcp dport { 80, 443 } ct state new,established accept # Open HTTP(S) ports
+
           iifname "lan" accept comment "Allow trusted networks to access the router"
 
           iifname "ppp0" ct state { established, related } counter accept comment "Allow returning traffic from ppp0"
@@ -178,12 +180,24 @@
 
       no-hosts = true;
       address = [
-        "/just-passing-through.lan.vasylenko.uk/192.168.10.1"
-        "/router.vasylenko.uk/192.168.10.1"
+        "/${hostName}.lan.vasylenko.uk/192.168.10.1"
+        "/vasylenko.uk/192.168.10.1"
       ];
-      cname = "*.vasylenko.uk,determinist.lan.vasylenko.uk";
     };
   };
+
+  services.caddy.virtualHosts."router.vasylenko.uk".extraConfig = ''
+    respond "Hello, world!"
+  '';
+
+  services.cfdyndns = {
+    enable = true;
+    email = "elias@vasylenko.uk";
+    apiTokenFile = "%d/apitoken";
+    records = [ "vasylenko.uk" ];
+  };
+  systemd.services.cfdyndns.serviceConfig.ProtectSystem = "strict";
+  systemd.services.cfdyndns.serviceConfig.LoadCredentialEncrypted = "apitoken:/etc/credstore.encrypted/cfdyndns-api-token.cred";
 
   system.stateVersion = "24.05";
 }

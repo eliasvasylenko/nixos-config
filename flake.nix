@@ -13,8 +13,9 @@
     let
       hostNames = builtins.attrNames
         (filterAttrs (n: v: v == "directory")
-	(builtins.readDir ./hosts));
+          (builtins.readDir ./hosts));
       hosts = attrsets.genAttrs hostNames (hostName: nixosSystem {
+        specialArgs = { hostName = hostName; };
         modules = [
           ({ ... }: { networking.hostName = hostName; })
           ./hosts/${hostName}/configuration.nix
@@ -41,7 +42,7 @@
             })
           ];
           shellHook = ''
-            printf "VSCodiumsss with extensions:\n"
+            printf "VSCodium with extensions:\n"
             codium --list-extensions
           '';
         };

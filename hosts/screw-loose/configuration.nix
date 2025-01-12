@@ -35,6 +35,7 @@
     firefox
     direnv
     prismlauncher
+    screen
   ];
 
   services.libinput.enable = true;
