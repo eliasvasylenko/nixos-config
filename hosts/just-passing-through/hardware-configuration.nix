@@ -12,6 +12,9 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
+  boot.kernelParams = [
+    "console=ttyS0,38400"
+  ];
 
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/b86f4dd5-95d2-4cd1-978b-529a232afda8";

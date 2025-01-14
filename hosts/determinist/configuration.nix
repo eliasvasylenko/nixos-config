@@ -9,9 +9,14 @@
     ../../system/base.nix
     ../../system/networking/wired.nix
 
+    ../../services/authelia.nix
     ../../services/caddy.nix
+    ../../services/fail2ban.nix
     ../../services/forgejo.nix
+    ../../services/freeradius.nix
+    ../../services/openldap.nix
     ../../services/ssh.nix
+    ../../services/step-ca.nix
   ];
 
   boot.swraid.enable = true;
