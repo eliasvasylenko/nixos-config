@@ -3,7 +3,7 @@
 {
   users.users.eli = {
     isNormalUser = true;
-    description = "Elias Vasylenko";
+    description = "Eli Vasylenko";
     extraGroups = [ "wheel" "weston_launch" ];
     packages = with pkgs; [];
     openssh.authorizedKeys.keys = [ "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBJbrxnO/GFEaCt8hdFr/ShLWHkG7rEQOcKapRIBZPt70FnbZKcQXgrgQt3fMBI6bSq1oa8hZHx8iUESgLkwXO83YJ/Y1GC+wDvVT/lluUx+Imm/mCn/DNqrcSW5IHHrI6Q==" ];

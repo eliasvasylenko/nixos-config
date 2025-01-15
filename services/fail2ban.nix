@@ -10,7 +10,7 @@
     bantime = "5m";
     bantime-increment = {
       enable = true;
-      factor = 1;
+      factor = "1";
       formula = "ban.Time * (1<<(ban.Count if ban.Count<20 else 20)) * banFactor";
       maxtime = "168h";
       overalljails = true;

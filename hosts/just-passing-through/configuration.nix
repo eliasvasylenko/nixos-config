@@ -17,7 +17,7 @@
   services.caddy.virtualHosts."lindsey.vasylenko.uk".extraConfig = ''
     respond "I love you!"
   '';
-  services.caddy.virtualHosts."elias.vasylenko.uk".extraConfig = ''
+  services.caddy.virtualHosts."eli.vasylenko.uk".extraConfig = ''
     respond "I smell!"
   '';
   services.caddy.virtualHosts."rudy.vasylenko.uk".extraConfig = ''
