@@ -1,12 +1,12 @@
 { config, pkgs, ... }:
 
 {
-  networking.firewall.allowedTCPPorts = [ 389 686 ];
+  networking.firewall.allowedTCPPorts = [ 686 ];
   services.openldap = {
     enable = true;
 
     /* enable plain connections only */
-    urlList = [ "ldap://ldap.vasylenko.uk/" ];
+    urlList = [ "ldaps:///" "ldaps://ldap.vasylenko.uk/" ];
 
     settings = {
       attrs = {
@@ -30,7 +30,7 @@
 
           /* your admin account, do not use writeText on a production system */
           olcRootDN = "cn=eli-admin,dc=vasylenko,dc=uk";
-          olcRootPW.path = "openldap/creds/ldap-admin-password";
+          olcRootPW.path = "/var/lib/openldap/creds/ldap-admin-password";
 
           olcAccess = [
             /* custom access rules for userPassword attributes */
@@ -47,6 +47,13 @@
       };
     };
   };
-  systemd.services.openldap.serviceConfig.BindPaths = ["%d:openldap/creds"];
-  systemd.services.openldap.serviceConfig.LoadCredentialEncrypted = ["ldap-admin-password:/etc/credstore.encrypted/ldap-admin-password.cred"];
+  systemd.services.openldap.serviceConfig.BindPaths = [
+    "%d:/var/lib/openldap/creds"
+  ];
+  systemd.services.openldap.serviceConfig.LoadCredentialEncrypted = [
+    "ldap-admin-password:/etc/credstore.encrypted/ldap-admin-password.cred"
+  ];
+  services.caddy.virtualHosts."ldap.vasylenko.uk".extraConfig = ''
+    reverse_proxy = localhost:686
+  '';
 }
