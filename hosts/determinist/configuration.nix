@@ -10,7 +10,7 @@
     ../../system/networking/wired.nix
 
     #../../services/authelia.nix
-    ../../services/caddy.nix
+    ../../services/caddy/internal.nix
     ../../services/fail2ban.nix
     ../../services/forgejo.nix
     #../../services/freeradius.nix
@@ -26,7 +26,7 @@
 
   virtualisation.libvirtd.enable = true;
 
-  networking.firewall.allowedTCPPorts = [ 80 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
 
   system.stateVersion = "24.05";
 }

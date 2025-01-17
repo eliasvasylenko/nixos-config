@@ -18,7 +18,7 @@
         chain input {
           type filter hook input priority 0; policy drop;
 
-          tcp dport { 80, 443 } ct state new,established accept # Open HTTP(S) ports
+          #tcp dport { 80, 443 } ct state new,established accept # Open HTTP(S) ports
 
           iifname "lan" accept comment "Allow trusted networks to access the router"
 

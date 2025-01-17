@@ -1,12 +1,11 @@
 { config, pkgs, ... }:
 
 {
-  networking.firewall.allowedTCPPorts = [ 686 ];
+  networking.firewall.allowedTCPPorts = [ 389 686 ];
   services.openldap = {
     enable = true;
 
-    /* enable plain connections only */
-    urlList = [ "ldaps:///" "ldaps://ldap.vasylenko.uk/" ];
+    urlList = [ "ldap:///" "ldaps:///" ];
 
     settings = {
       attrs = {
@@ -54,6 +53,6 @@
     "ldap-admin-password:/etc/credstore.encrypted/ldap-admin-password.cred"
   ];
   services.caddy.virtualHosts."ldap.vasylenko.uk".extraConfig = ''
-    reverse_proxy = localhost:686
+    reverse_proxy = localhost:389
   '';
 }

@@ -3,12 +3,14 @@
 {
   services.ddclient = {
     enable = true;
-    passwordFile = "$CREDENTIALS_DIRECTORY/cloudflare-ddclient-password";
+    passwordFile = "$CREDENTIALS_DIRECTORY/cloudflare-dns-edit";
     domains = [ "vasylenko.uk" "*.vasylenko.uk" ];
     zone = "vasylenko.uk";
     protocol = "cloudflare";
     use = "if, if=ppp0";
   };
   systemd.services.cfdyndns.serviceConfig.ProtectSystem = "strict";
-  systemd.services.ddclient.serviceConfig.LoadCredentialEncrypted = "cloudflare-ddclient-password:/etc/credstore.encrypted/cloudflare-ddclient-password.cred";
+  systemd.services.ddclient.serviceConfig.LoadCredentialEncrypted = [
+    "cloudflare-dns-edit:/etc/credstore.encrypted/cloudflare-dns-edit.cred"
+  ];
 }
