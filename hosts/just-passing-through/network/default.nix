@@ -79,7 +79,10 @@
 
       dhcp-range = [ "lan,192.168.10.50,192.168.10.254,24h" ];
       interface = [ "lan" "lo" ];
-      dhcp-host = "192.168.10.1";
+      dhcp-host = [
+        "192.168.10.1"
+        "00:90:FA:E6:F7:62,determinist,192.168.10.142,24h"
+      ];
 
       local = "/lan.vasylenko.uk/";
       domain = "lan.vasylenko.uk,192.168.10.0/24";
@@ -88,7 +91,8 @@
       no-hosts = true;
       address = [
         "/${hostName}.lan.vasylenko.uk/192.168.10.1"
-        "/vasylenko.uk/192.168.10.1"
+        "/router.vasylenko.uk/192.168.10.1"
+        "/vasylenko.uk/192.168.10.142"
       ];
     };
   };

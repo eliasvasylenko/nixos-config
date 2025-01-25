@@ -5,7 +5,7 @@
   ...
 }:
 let
-  domain = "determinist.vasylenko.uk";
+  domain = "vasylenko.uk";
 in {
   services.forgejo = {
     enable = true;
@@ -27,6 +27,7 @@ in {
   networking.firewall.allowedUDPPorts = [ 3000 ];
 
   services.caddy.virtualHosts."git.${domain}".extraConfig = ''
+    tls internal
     reverse_proxy = localhost:3000
   '';
 

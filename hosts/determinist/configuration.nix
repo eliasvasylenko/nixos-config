@@ -17,7 +17,7 @@
     ../../services/immich.nix
     ../../services/openldap.nix
     ../../services/ssh.nix
-    #../../services/step-ca.nix
+    ../../services/step-ca.nix
   ];
 
   boot.swraid.mdadmConf = ''
