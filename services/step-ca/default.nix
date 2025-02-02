@@ -24,6 +24,25 @@
         dataSource = "/var/lib/step-ca/db";
         badgerFileLoadingMode = "";
       };
+      policy = {
+        x509 = {
+          allow = {
+            dns= [ "*.vasylenko.uk" ];
+          };
+        };
+        ssh = {
+          user = {
+            allow = {
+              email = [ "@vasylenko.uk" ];
+            };
+          };
+          host = {
+            allow = {
+              dns = [ "*.vasylenko.uk" ];
+            };
+          };
+        };
+      };
       authority = {
         provisioners = [
           {
@@ -48,6 +67,26 @@
             name = "sshpop";
             claims = {
               enableSSHCA = true;
+            };
+          }
+          {
+            type = "ACME";
+            name = "acme";
+            claims = {
+              maxTLSCertDuration=  "8h";
+              defaultTLSCertDuration = "2h";
+            };
+            caaIdentities = [];
+            challenges = [
+              "dns-01"
+            ];
+            attestationFormats = [
+              "tpm"
+            ];
+            options = {
+              x509 = {
+                templateFile = "templates/certs/x509/default.tpl";
+              };
             };
           }
         ];
@@ -126,7 +165,22 @@
     "intermediate_password:/etc/credstore.encrypted/ca-intermediate-password.cred"
   ];
   services.caddy.virtualHosts."ca.vasylenko.uk".extraConfig = ''
-    tls internal
-    reverse_proxy = localhost:7443
+    tls eli@vasylenko.uk {
+      dns cloudflare {
+        zone_token {file./var/lib/caddy/creds/cloudflare-zone-read}
+        api_token {file./var/lib/caddy/creds/cloudflare-dns-edit}
+      }
+      ca https://localhost:7443/acme/acme/directory
+      ca_root ${../system/certs/root_ca.crt}
+      client_auth {
+          mode require_and_verify
+          trusted_ca_cert_file ${../system/certs/root_ca.crt}
+      }
+    }
+    reverse_proxy localhost:7443 {
+      transport http {
+        tls_trusted_ca_certs ${../system/certs/root_ca.crt}
+      }
+    }
   '';
 }

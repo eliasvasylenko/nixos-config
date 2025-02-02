@@ -17,7 +17,7 @@
     ../../services/immich.nix
     ../../services/openldap.nix
     ../../services/ssh.nix
-    ../../services/step-ca.nix
+    ../../services/step-ca
   ];
 
   boot.swraid.mdadmConf = ''
@@ -27,6 +27,10 @@
   virtualisation.libvirtd.enable = true;
 
   networking.firewall.allowedTCPPorts = [ 80 443 ];
+
+  # the following is temporary, seemed necessary for some reason to turn it off...
+  systemd.tpm2.enable = false;
+  boot.initrd.systemd.tpm2.enable = false;
 
   system.stateVersion = "24.05";
 }

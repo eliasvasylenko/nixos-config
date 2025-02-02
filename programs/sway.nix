@@ -16,6 +16,10 @@
       wl-clipboard
       adwaita-icon-theme
       waybar
+      brightnessctl
+      alsa-utils
+      wireplumber
+      pavucontrol
       mako
       fuzzel
       wofi

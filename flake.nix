@@ -34,6 +34,7 @@
       devShells = forAllSystems ({pkgs, system, extensions}: {
         default = pkgs.mkShell {
           buildInputs = [
+            pkgs.step-cli
             (pkgs.vscode-with-extensions.override {
               vscode = pkgs.vscodium;
               vscodeExtensions = [
@@ -44,6 +45,7 @@
           shellHook = ''
             printf "VSCodium with extensions:\n"
             codium --list-extensions
+            export STEPPATH=$(git rev-parse --show-toplevel)/services/step-ca
           '';
         };
       });

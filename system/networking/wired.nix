@@ -1,5 +1,8 @@
 { config, pkgs, ... }:
 
 {
-  networking.firewall.enable = true;
+  networking = {
+    firewall.enable = true;
+    useNetworkd = true;
+  };
 }

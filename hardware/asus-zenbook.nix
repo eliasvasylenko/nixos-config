@@ -5,20 +5,10 @@
     ./nvidia.nix
   ];
 
-  boot.extraModulePackages = with config.boot.kernelPackages; [
-    acpi_call
-  ];
-  boot.kernelModules = [ "acpi_call" ];
-  systemd.services.screenpad-backlight = {
-    enable = true;
-    script = ''
-      echo '\_SB.ATKD.WMNB 0x0 0x53564544 b32000500FF000000' | tee /proc/acpi/call
-    '';
-    wantedBy = [ "multi-user.target" ];
-  };
   nixpkgs.config.nvidia.acceptLicense = true;
   boot.kernelParams = [
     "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+    #"acpi_osi=" # This stops one of backlights coming up
   ];
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.beta;
@@ -28,6 +18,35 @@
       nvidiaBusId = "PCI:1:2:0";
     };
   };
-  powerManagement.enable = false;
   services.hardware.bolt.enable = true;
+
+  services.actkbd = {
+    enable = true;
+    bindings = [
+      # Mute
+      { keys = [ 113 ]; events = [ "key" ];
+        command = "${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+      }
+      # Volume down
+      { keys = [ 114 ]; events = [ "key" "rep" ];
+        command = "${pkgs.wireplumber}/bin/wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%-";
+      }
+      # Volume up
+      { keys = [ 115 ]; events = [ "key" "rep" ];
+        command = "${pkgs.wireplumber}/bin/wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+";
+      }
+      # Mic Mute
+      { keys = [ 190 ]; events = [ "key" ];
+        command = "${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+      }
+      # Brightness down
+      { keys = [ 224 ]; events = [ "key" "rep" ];
+        command = "${pkgs.brightnessctl}/bin/brightnessctl -d intel_backlight s 10%- && ${pkgs.brightnessctl}/bin/brightnessctl -d asus_screenpad s 10%-";
+      }
+      # Brightness up
+      { keys = [ 225 ]; events = [ "key" "rep" ];
+        command = "${pkgs.brightnessctl}/bin/brightnessctl -d intel_backlight s 10%+ && ${pkgs.brightnessctl}/bin/brightnessctl -d asus_screenpad s 10%+";
+      }
+    ];
+  };
 }

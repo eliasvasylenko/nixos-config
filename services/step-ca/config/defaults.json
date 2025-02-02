@@ -1,0 +1,6 @@
+{
+	"ca-url": "https://ca.vasylenko.uk:7443",
+	"ca-config": "./services/step-ca/config/ca.json",
+	"fingerprint": "239bbf7aa295697f836a426334cb1618c3233aa4baf710641f51205e758eedf0",
+	"root": "./services/step-ca/certs/root_ca.crt"
+}
