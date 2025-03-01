@@ -3,6 +3,10 @@
 {
   networking = {
     firewall.enable = true;
-    useNetworkd = true;
+    useDHCP = false;
+  };
+
+  systemd.network = {
+    enable = true;
   };
 }

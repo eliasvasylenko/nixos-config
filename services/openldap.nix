@@ -53,7 +53,6 @@
     "ldap-admin-password:/etc/credstore.encrypted/ldap-admin-password.cred"
   ];
   services.caddy.virtualHosts."ldap.vasylenko.uk".extraConfig = ''
-    tls internal
-    reverse_proxy = localhost:389
+    reverse_proxy localhost:389
   '';
 }

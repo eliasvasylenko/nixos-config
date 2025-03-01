@@ -13,10 +13,12 @@ in {
 
     settings = {
       server = {
-        DOMAIN = domain;
-        HTTP_ADDR = domain;
+        DOMAIN = "git.${domain}";
+        SSH_DOMAIN = "git.${domain}";
+        HTTP_ADDR = "localhost";
         HTTP_PORT = 3000;
         SSH_PORT = 2222;
+        ROOT_URL = "https://git.vasylenko.uk/";
       };
 
       service.DISABLE_REGISTRATION = true;
@@ -27,8 +29,7 @@ in {
   networking.firewall.allowedUDPPorts = [ 3000 ];
 
   services.caddy.virtualHosts."git.${domain}".extraConfig = ''
-    tls internal
-    reverse_proxy = localhost:3000
+    reverse_proxy localhost:3000
   '';
 
   services.restic.backups.forgejo = {

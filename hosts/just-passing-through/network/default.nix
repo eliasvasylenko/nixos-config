@@ -2,13 +2,14 @@
 
 {
   imports = [
+    ./dns.nix
     ./firewall.nix
     ./pppoe.nix
   ];
 
   networking = {
     useDHCP = false;
-    useNetworkd = true;
+    useNetworkd = false;
 
     nat.enable = false;
     firewall.enable = false;
@@ -65,35 +66,5 @@
     # On WAN, allow IPv6 autoconfiguration and tempory address use.
     "net.ipv6.conf.wan.accept_ra" = 2;
     "net.ipv6.conf.wan.autoconf" = 1;
-  };
-
-  services.dnsmasq = {
-    enable = true;
-    settings = {
-      server = [ "1.1.1.1" "9.9.9.9" ];
-      domain-needed = true;
-      bogus-priv = true;
-      no-resolv = true;
-
-      cache-size = 1000;
-
-      dhcp-range = [ "lan,192.168.10.50,192.168.10.254,24h" ];
-      interface = [ "lan" "lo" ];
-      dhcp-host = [
-        "192.168.10.1"
-        "00:90:FA:E6:F7:62,determinist,192.168.10.142,24h"
-      ];
-
-      local = "/lan.vasylenko.uk/";
-      domain = "lan.vasylenko.uk,192.168.10.0/24";
-      expand-hosts = true;
-
-      no-hosts = true;
-      address = [
-        "/${hostName}.lan.vasylenko.uk/192.168.10.1"
-        "/router.vasylenko.uk/192.168.10.1"
-        "/vasylenko.uk/192.168.10.142"
-      ];
-    };
   };
 }
