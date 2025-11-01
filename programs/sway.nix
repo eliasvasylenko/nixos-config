@@ -1,5 +1,4 @@
-{ config, pkgs, ... }:
-
+{ pkgs, ... }:
 {
   xdg.portal = {
     enable = true;
@@ -28,7 +27,7 @@
   };
   programs.xwayland.enable = true;
 
-  environment.sessionVariables = rec {
+  environment.sessionVariables = {
     SDL_VIDEODRIVER = "wayland";
     XDG_SESSION_TYPE = "wayland";
     XDG_CURRENT_DESKTOP = "sway";

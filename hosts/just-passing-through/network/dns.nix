@@ -1,5 +1,4 @@
-{ config, lib, pkgs, hostName, ... }:
-
+{ pkgs, hostName, ... }:
 {
   services.bind = {
     enable = true;
@@ -41,33 +40,38 @@
       };
     '';
   };
-  systemd.services.bind.serviceConfig = {
-    ExecStartPre = [
-      "${pkgs.coreutils}/bin/mkdir -p /run/named/zones"
-      "${pkgs.coreutils}/bin/cp -n ${pkgs.writeText "zone-vasylenko.uk" ''
-        $ORIGIN vasylenko.uk.
-        $TTL    1h
-        @            IN      SOA     ns1 eli (
-                                          1    ; Serial
-                                          3h   ; Refresh
-                                          1h   ; Retry
-                                          1w   ; Expire
-                                          1h)  ; Negative Cache TTL
-                     IN      NS      ns1
-                     IN      A       192.168.10.1
+  systemd.services.bind.serviceConfig.ExecStartPre = [
+    "${pkgs.coreutils}/bin/mkdir -p /run/named/zones"
+    "${pkgs.coreutils}/bin/cp -n ${pkgs.writeText "zone-vasylenko.uk" ''
+      $ORIGIN vasylenko.uk.
+      $TTL    1h
+      @            IN      SOA     ns1 eli (
+                                        1    ; Serial
+                                        3h   ; Refresh
+                                        1h   ; Retry
+                                        1w   ; Expire
+                                        1h)  ; Negative Cache TTL
+                    IN      NS      ns1
+                    IN      A       192.168.10.1
 
-        ns1          IN      A       192.168.10.1
+      ns1          IN      A       192.168.10.1
 
-        $ORIGIN lan.vasylenko.uk.
-        @            IN      NS      ns1.vasylenko.uk.
-      ''} /run/named/zones/zone-vasylenko.uk"
-    ];
-    BindPaths = [ "%d:/var/lib/bind/creds" ];
-    LoadCredentialEncrypted = [
-      "just-passing-through-rfc2136:/etc/credstore.encrypted/just-passing-through-rfc2136.cred"
-      "determinist-rfc2136:/etc/credstore.encrypted/determinist-rfc2136.cred"
-    ];
+      $ORIGIN lan.vasylenko.uk.
+      @            IN      NS      ns1.vasylenko.uk.
+    ''} /run/named/zones/zone-vasylenko.uk"
+  ];
+  secret-agent.keys."bind/determinist-rfc2136" = {
+    generate = [ "${pkgs.bind}/bin/tsig-keygen" "-ahmac-sha512" "rfc2136" ];
+    systemd.bind = {
+      enable = true;
+      bindPath = "/var/lib/bind/creds/";
+    };
+    systemd.caddy = {
+      enable = true;
+      bindPath = "/var/lib/caddy/creds/rfc2136";
+    };
   };
+
   services.dnsmasq = {
     enable = true;
     settings = {

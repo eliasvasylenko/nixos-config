@@ -3,7 +3,6 @@
   hostName,
   ...
 }: {
-  # tsig-keygen -a hmac-sha512 determinist.vasylenko.uk
   services.caddy = {
     enable = true;
     logFormat = ''
@@ -48,10 +47,22 @@
     '';
   };
   systemd.services.caddy.serviceConfig = {
-    BindPaths = [ "%d:/var/lib/caddy/creds" ];
+    BindPaths = [ "%d:/var/lib/caddy/creds/" ];
     LoadCredentialEncrypted = [
       "rfc2136:/etc/credstore.encrypted/rfc2136.cred"
     ];
   };
+
+  secret-agent.keys."bind/${hostName}-rfc2136" = {
+    generate = [ "${pkgs.bind}/bin/tsig-keygen" "-ahmac-sha512" "rfc2136" ];
+    systemd.caddy = {
+      enable = true;
+      bindPath = "/var/lib/caddy/creds/rfc2136";
+    };
+    remote."just-passing-through" = {
+      enable = true;
+    };
+  };
+
   # TODO systemd.services.caddy.serviceConfig.ProtectSystem = "strict";
 }

@@ -1,5 +1,4 @@
-{ config, pkgs, ... }:
-
+{ pkgs, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -11,6 +10,7 @@
     ../../system/fonts.nix
 
     ../../services/pipewire.nix
+    ../../services/postgres.nix
     ../../services/tpm.nix
 
     ../../programs/steam.nix
@@ -25,17 +25,16 @@
   };
   console.keyMap = "uk";
 
-  virtualisation.docker.rootless = {
-    enable = true;
-    setSocketVariable = true;
-  };
-
   environment.systemPackages = with pkgs; [
     alacritty
     firefox
     direnv
     prismlauncher
     screen
+    openldap
+    inetutils
+    nmap
+    unixtools.arp
   ];
 
   services.libinput.enable = true;

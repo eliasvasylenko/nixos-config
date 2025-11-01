@@ -1,5 +1,4 @@
-{ config, pkgs, ... }:
-
+{ pkgs, ... }:
 {
   # TODO update with pipewire stuff IFF pipewire is enabled
 

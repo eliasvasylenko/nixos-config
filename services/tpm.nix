@@ -1,5 +1,4 @@
-{ config, lib, pkgs, ... }:
-
+{ pkgs, ... }:
 {
   security.tpm2 = {
     enable = true;
@@ -11,6 +10,6 @@
   environment.systemPackages = with pkgs; [
     tpm2-tools
   ];
-  
+
   users.users.eli.extraGroups = [ "tss" ];
 }

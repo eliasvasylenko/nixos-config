@@ -45,7 +45,7 @@ in {
     ];
     backupPrepareCommand = lib.getExe (pkgs.writeShellApplication {
       name = "forgejo-backup-prepare";
-      runtimeInputs = with pkgs; [ config.services.postgresql.package ];
+      runtimeInputs = [ config.services.postgresql.package ];
       text = "systemctl stop forgejo && pg_dump ${config.services.forgejo.database.name} --file=/var/lib/forgejo/forgejo-db.sql";
     });
     backupCleanupCommand = lib.getExe (pkgs.writeShellApplication {

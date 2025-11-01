@@ -1,5 +1,4 @@
-{ config, lib, pkgs, hostName, ... }:
-
+{ ... }:
 {
   services.pppd = {
     enable = true;

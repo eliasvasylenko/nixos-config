@@ -11,43 +11,60 @@
     { self, nixpkgs, ... }@inputs:
     with nixpkgs.lib;
     let
-      hostNames = builtins.attrNames
-        (filterAttrs (n: v: v == "directory")
-          (builtins.readDir ./hosts));
-      hosts = attrsets.genAttrs hostNames (hostName: nixosSystem {
-        specialArgs = { hostName = hostName; };
-        modules = [
-          ({ ... }: { networking.hostName = hostName; })
-          ./hosts/${hostName}/configuration.nix
-        ];
-      });
-      devSystems = [ "x86_64-linux" "aarch64-linux" ];
-      forAllSystems = function:
-        genAttrs devSystems (system: function (rec {
-          inherit system;
-          pkgs = nixpkgs.legacyPackages.${system};
-          extensions = inputs.nix-vscode-extensions.extensions.${system};
-        }));
+      hostNames = builtins.attrNames (filterAttrs (n: v: v == "directory") (builtins.readDir ./hosts));
+      hosts = attrsets.genAttrs hostNames (
+        hostName:
+        nixosSystem {
+          specialArgs = { inherit hostName hosts; };
+          modules = [
+            ./system/networking/hostName.nix
+            ./hosts/${hostName}/configuration.nix
+          ];
+        }
+      );
+      devSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+      forAllSystems =
+        function:
+        genAttrs devSystems (
+          system:
+          function (rec {
+            inherit system;
+            pkgs = nixpkgs.legacyPackages.${system};
+            extensions = inputs.nix-vscode-extensions.extensions.${system};
+          })
+        );
     in
     {
       nixosConfigurations = hosts;
-      devShells = forAllSystems ({pkgs, system, extensions}: {
-        default = pkgs.mkShell {
-          buildInputs = [
-            pkgs.step-cli
-            (pkgs.vscode-with-extensions.override {
-              vscode = pkgs.vscodium;
-              vscodeExtensions = [
-                extensions.open-vsx.jnoortheen.nix-ide
-              ];
-            })
-          ];
-          shellHook = ''
-            printf "VSCodium with extensions:\n"
-            codium --list-extensions
-            export STEPPATH=$(git rev-parse --show-toplevel)/services/step-ca
-          '';
-        };
-      });
+      devShells = forAllSystems (
+        {
+          pkgs,
+          system,
+          extensions,
+        }:
+        {
+          default = pkgs.mkShell {
+            buildInputs = [
+              pkgs.step-cli
+              (pkgs.vscode-with-extensions.override {
+                vscode = pkgs.vscodium;
+                vscodeExtensions = [
+                  extensions.open-vsx.jnoortheen.nix-ide
+                ];
+              })
+              pkgs.nil
+              pkgs.nixfmt-rfc-style
+            ];
+            shellHook = ''
+              printf "VSCodium with extensions:\n"
+              codium --list-extensions
+              export STEPPATH=$(git rev-parse --show-toplevel)/services/step-ca
+            '';
+          };
+        }
+      );
     };
 }

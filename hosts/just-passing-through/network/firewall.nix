@@ -1,5 +1,4 @@
-{ config, lib, pkgs, hostName, ... }:
-
+{ ... }:
 {
   networking.nftables = {
     enable = true;

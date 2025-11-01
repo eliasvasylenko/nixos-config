@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ ... }:
 
 {
   services.immich = {
@@ -7,6 +7,9 @@
     machine-learning.enable = false;
     port = 2283;
     host = "localhost";
+    database = {
+      #port = 37588;
+    };
   };
   users.users.immich.extraGroups = [ "video" "render" ];
   services.caddy.virtualHosts."photos.vasylenko.uk".extraConfig = ''
