@@ -10,41 +10,36 @@
   };
 
   outputs =
-    {
-      nixpkgs,
-      nix-vscode-extensions,
-      self,
-    }@inputs:
+    { nixpkgs, self, ... }:
     let
       forEachSystem = self.lib.forEachSystem [
         "x86_64-linux"
         "aarch64-linux"
-      ] (inputs // { root = ./.; });
+      ];
     in
     {
-      lib = import ./nix/lib.nix nixpkgs;
+      lib = import ./lib.nix self;
       nixosConfigurations = self.lib.readDirs ./hosts (
         hostName:
-        self.lib.nixosSystem {
-          specialArgs = { inherit hostName self; };
+        nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit self; };
           modules = [
-            ./system/networking/hostName.nix
+            { networking.hostName = hostName; }
             ./hosts/${hostName}/configuration.nix
           ];
         }
       );
       devShells = forEachSystem (
-        { pkgs, system }:
+        { system, ... }:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
         {
           default = pkgs.mkShell {
             buildInputs = [
               pkgs.step-cli
-              pkgs.nil
-              pkgs.nixfmt-rfc-style
             ];
             shellHook = ''
-              printf "VSCodium with extensions:\n"
-              codium --list-extensions
               export STEPPATH=$(git rev-parse --show-toplevel)/services/step-ca
             '';
           };

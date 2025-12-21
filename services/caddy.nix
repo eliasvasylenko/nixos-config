@@ -1,6 +1,5 @@
 {
   pkgs,
-  hostName,
   config,
   ...
 }: {
@@ -24,14 +23,14 @@
       acme_ca https://ca.vasylenko.uk/acme/acme/directory
       acme_ca_root ${../system/certs/root_ca.crt}
       acme_dns rfc2136 {
-        key_name "${hostName}.lan.vasylenko.uk"
+        key_name "${config.networking.hostName}.lan.vasylenko.uk"
         key_alg "hmac-sha512"
-        key "{file.${config.secret-agent.keys."bind/${hostName}-rfc2136".systemd.bindpath}}"
+        key "{file.${config.secret-agent.keys."bind/${config.networking.hostName}-rfc2136".systemd.bindpath}}"
         server "ns1.vasylenko.uk:53"
       }
       dynamic_dns {
         provider rfc2136 {
-          key_name "${hostName}.lan.vasylenko.uk"
+          key_name "${config.networking.hostName}.lan.vasylenko.uk"
           key_alg "hmac-sha512"
           key "{file./var/lib/caddy/creds/rfc2136}"
           server "ns1.vasylenko.uk:53"
@@ -54,7 +53,7 @@
     ];
   };
 
-  secret-agent.keys."bind/${hostName}-rfc2136" = {
+  secret-agent.keys."bind/${config.networking.hostName}-rfc2136" = {
     generate = [ "${pkgs.bind}/bin/tsig-keygen" "-ahmac-sha512" "rfc2136" ];
     systemd.caddy = {
       enable = true;

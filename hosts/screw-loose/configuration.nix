@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, self, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -25,6 +25,8 @@
   };
   console.keyMap = "uk";
 
+  nixpkgs.overlays = [ self.inputs.nix-vscode-extensions.overlays.default ];
+
   environment.systemPackages = with pkgs; [
     alacritty
     firefox
@@ -35,6 +37,8 @@
     inetutils
     nmap
     unixtools.arp
+    nil
+    nixfmt-rfc-style
     (pkgs.vscode-with-extensions.override {
       vscode = pkgs.vscodium;
       vscodeExtensions = with pkgs.nix-vscode-extensions.open-vsx; [

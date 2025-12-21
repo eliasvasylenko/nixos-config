@@ -1,6 +1,0 @@
-{ hostName, ... }:
-{
-  networking = {
-    inherit hostName;
-  };
-}

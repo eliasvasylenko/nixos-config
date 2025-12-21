@@ -1,31 +1,27 @@
-nixpkgs:
-{
+self: with self.inputs.nixpkgs; rec {
   forEachSystem =
-    systems: {nixpkgs, self}: function:
-    nixpkgs.lib.genAttrs systems (
+    systems: function:
+    lib.genAttrs systems (
       system:
-      function ({
-        inherit system nixpkgs self;
-        pkgs = import nixpkgs { inherit system; };
-        }
-      )
+      function {
+        inherit system self;
+        pkgs = legacyPackages.${system};
+      }
     );
 
-  importNixFiles =
-    path: args:
-    with nixpkgs.lib;
+  readNixFiles =
+    path:
     let
-      allFiles = builtins.attrNames (filterAttrs (n: v: v == "regular") (builtins.readDir path));
-      nixFiles = builtins.filter (strings.hasSuffix ".nix") allFiles;
-      nixFileNames = builtins.map (strings.removeSuffix ".nix") nixFiles;
+      allFiles = builtins.attrNames (lib.filterAttrs (n: v: v == "regular") (builtins.readDir path));
     in
-    attrsets.genAttrs nixFileNames (regularFile: import "${path}/${regularFile}.nix" args);
+    lib.genAttrs allFiles (regularFile: "${path}/${regularFile}");
+
+  importNixFiles = path: args: lib.mapAttrs (name: file: import file args) (readNixFiles path);
 
   readDirs =
     path: function:
-    with nixpkgs.lib;
     let
-      allDirs = builtins.attrNames (filterAttrs (n: v: v == "directory") (builtins.readDir path));
+      allDirs = builtins.attrNames (lib.filterAttrs (n: v: v == "directory") (builtins.readDir path));
     in
-    attrsets.genAttrs allDirs function;
+    lib.genAttrs allDirs function;
 }

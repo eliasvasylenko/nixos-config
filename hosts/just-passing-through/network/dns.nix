@@ -1,4 +1,4 @@
-{ pkgs, hostName, ... }:
+{ pkgs, config, ... }:
 {
   services.bind = {
     enable = true;
@@ -93,7 +93,7 @@
 
       no-hosts = true;
       address = [
-        "/${hostName}.lan.vasylenko.uk/192.168.10.1"
+        "/${config.networking.hostName}.lan.vasylenko.uk/192.168.10.1"
       ];
     };
   };
