@@ -123,9 +123,7 @@
     '';
   };
   systemd.services.openldap.serviceConfig = {
-    BindPaths = [
-      "%d:/var/lib/openldap/creds"
-    ];
+    BindPaths = [ "%d:/var/lib/openldap/creds" ];
     LoadCredentialEncrypted = [
       "ldap-admin-password:/etc/credstore.encrypted/ldap-admin-password.cred"
     ];

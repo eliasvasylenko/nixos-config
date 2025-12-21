@@ -35,6 +35,12 @@
     inetutils
     nmap
     unixtools.arp
+    (pkgs.vscode-with-extensions.override {
+      vscode = pkgs.vscodium;
+      vscodeExtensions = with pkgs.nix-vscode-extensions.open-vsx; [
+        jnoortheen.nix-ide
+      ];
+    })
   ];
 
   services.libinput.enable = true;

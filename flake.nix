@@ -3,58 +3,42 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
-    nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
+    nix-vscode-extensions = {
+      url = "github:nix-community/nix-vscode-extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { self, nixpkgs, ... }@inputs:
-    with nixpkgs.lib;
+    {
+      nixpkgs,
+      nix-vscode-extensions,
+      self,
+    }@inputs:
     let
-      hostNames = builtins.attrNames (filterAttrs (n: v: v == "directory") (builtins.readDir ./hosts));
-      hosts = attrsets.genAttrs hostNames (
+      forEachSystem = self.lib.forEachSystem [
+        "x86_64-linux"
+        "aarch64-linux"
+      ] (inputs // { root = ./.; });
+    in
+    {
+      lib = import ./nix/lib.nix nixpkgs;
+      nixosConfigurations = self.lib.readDirs ./hosts (
         hostName:
-        nixosSystem {
-          specialArgs = { inherit hostName hosts; };
+        self.lib.nixosSystem {
+          specialArgs = { inherit hostName self; };
           modules = [
             ./system/networking/hostName.nix
             ./hosts/${hostName}/configuration.nix
           ];
         }
       );
-      devSystems = [
-        "x86_64-linux"
-        "aarch64-linux"
-      ];
-      forAllSystems =
-        function:
-        genAttrs devSystems (
-          system:
-          function (rec {
-            inherit system;
-            pkgs = nixpkgs.legacyPackages.${system};
-            extensions = inputs.nix-vscode-extensions.extensions.${system};
-          })
-        );
-    in
-    {
-      nixosConfigurations = hosts;
-      devShells = forAllSystems (
-        {
-          pkgs,
-          system,
-          extensions,
-        }:
+      devShells = forEachSystem (
+        { pkgs, system }:
         {
           default = pkgs.mkShell {
             buildInputs = [
               pkgs.step-cli
-              (pkgs.vscode-with-extensions.override {
-                vscode = pkgs.vscodium;
-                vscodeExtensions = [
-                  extensions.open-vsx.jnoortheen.nix-ide
-                ];
-              })
               pkgs.nil
               pkgs.nixfmt-rfc-style
             ];
