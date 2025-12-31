@@ -65,15 +65,16 @@
         };
       };
     };
-    secrets.jwtSecretFile = "/var/lib/authelia/creds/jwt-secret";
-    secrets.storageEncryptionKeyFile = "/var/lib/authelia/creds/storage-encryption-key";
+    # TODO radicle splits on :, if there is one it's encrypted, else it's not.
+    secrets.jwtSecretFile.loadEncrypted = "jwt-secret:/var/lib/authelia/creds/jwt-secret";
+    secrets.storageEncryptionKeyFile.loadEncrypted = "storage-encryption-key:/var/lib/authelia/creds/storage-encryption-key";
   };
 
   # Creds
   systemd.services.authelia-prod.serviceConfig = {
     BindPaths = [ "%d:/var/lib/authelia/creds" ];
     LoadCredentialEncrypted = [
-      "ldap-admin-password:/etc/credstore.encrypted/ldap-admin-password.cred"
+      "ldap-authelia-password:/etc/credstore.encrypted/ldap-authelia-password.cred"
       "jwt-secret:/etc/credstore.encrypted/jwt-secret.cred"
       "storage-encryption-key:/etc/credstore.encrypted/storage-encryption-key.cred"
     ];
