@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 {
   services.postgresql.enable = true;
 
@@ -19,16 +19,9 @@
     };
   };
 
-  secret-agent.keys."keycloak/db_password" = {
-    generate = [ "${pkgs.openssl}/bin/openssl" "rand" "-base64" "32" ];
-    systemd.keycloak = {
-      enable = true;
-      bindPath = config.services.keycloak.database.passwordFile;
-    };
-    systemd.keycloakPostgreSQLInit = {
-      enable = true;
-      suppressUnencrypted = true;
-    };
+  secret-agent."keycloak/db_password" = {
+    create = [ "${pkgs.openssl}/bin/openssl" "rand" "-base64" "32" ];
+    systemd.enable = true;
   };
 
   services.caddy.virtualHosts."auth.vasylenko.uk".extraConfig = ''

@@ -1,9 +1,10 @@
-{ ... }:
+{ config, ... }:
 
 {
   services.ddclient = {
     enable = true;
-    passwordFile = "$CREDENTIALS_DIRECTORY/cloudflare-dns-edit";
+    #passwordFile = "$CREDENTIALS_DIRECTORY/cloudflare-dns-edit";
+    passwordFile.LoadCredentialEncrypted = config.secretAgent.cloudflareDnsEdit.envVar;
     domains = [ "vasylenko.uk" "*.vasylenko.uk" ];
     zone = "vasylenko.uk";
     protocol = "cloudflare";

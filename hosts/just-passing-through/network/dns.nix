@@ -62,6 +62,7 @@
   ];
   secret-agent.keys."bind/determinist-rfc2136" = {
     generate = [ "${pkgs.bind}/bin/tsig-keygen" "-ahmac-sha512" "rfc2136" ];
+    # Update bind in nixpkgs to `import` from an arbitrary list of creds
     systemd.bind = {
       enable = true;
       bindPath = "/var/lib/bind/creds/";

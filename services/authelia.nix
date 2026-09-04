@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 {
   # Authelia
@@ -10,7 +10,8 @@
         address = "ldap://ds.vasylenko.uk";
         implementation = "custom";
         user = "uid=auth,ou=services,dc=vasylenko,dc=uk";
-        password = ''{{- fileContent "/var/lib/authelia/creds/ldap-authelia-password"}}'';
+        # Can we use `.path` so expand to {{- fileContent }}, and LoadCredentialEncrypted to add systemd creds stuff?
+        password.path.LoadCredentialEncrypted = config.secret-agent.secrets.authelia.creds;
         base_dn = "dc=vasylenko,dc=uk";
         username_attribute = "uid";
         users_filter = "(&({username_attribute}={input})(objectClass=inetOrgPerson))";
@@ -57,7 +58,9 @@
         smtp = {
           address = "smtp://smtp.mailbox.org";
           username = "eli@mailbox.org";
-          password = ''{{- fileContent "/var/lib/authelia/creds/mailbox-password"}}'';  # TODO update
+          # Can we use `.path` so expand to {{- fileContent }}, and LoadCredentialEncrypted to add systemd creds stuff?
+          #password = ''{{- fileContent "/var/lib/authelia/creds/mailbox-password"}}''; # TODO update
+          password.path.loadEncrypted = "ref to secret-agent";
           timeout = "5s";
           disable_require_tls = false;
           sender = "Auth Notifier <login@vasylenko.uk>";
@@ -66,8 +69,8 @@
       };
     };
     # TODO radicle splits on :, if there is one it's encrypted, else it's not.
-    secrets.jwtSecretFile.loadEncrypted = "jwt-secret:/var/lib/authelia/creds/jwt-secret";
-    secrets.storageEncryptionKeyFile.loadEncrypted = "storage-encryption-key:/var/lib/authelia/creds/storage-encryption-key";
+    secrets.jwtSecretFile.LoadCredentialEncrypted = "jwt-secret:/var/lib/authelia/creds/jwt-secret";
+    secrets.storageEncryptionKeyFile.LoadCredentialEncrypted = "storage-encryption-key:/var/lib/authelia/creds/storage-encryption-key";
   };
 
   # Creds

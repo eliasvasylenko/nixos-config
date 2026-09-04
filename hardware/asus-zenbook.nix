@@ -11,7 +11,7 @@
     #"acpi_osi=" # This stops one of backlights coming up
   ];
   hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.bleeding_edge;
     prime = {
       sync.enable = true;
       intelBusId = "PCI:0:2:0";
@@ -19,6 +19,7 @@
     };
   };
   services.hardware.bolt.enable = true;
+  hardware.bluetooth.enable = true;
 
   services.actkbd = {
     enable = true;

@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  hardware.pulseaudio = {
+  services.pulseaudio = {
     enable = true;
     systemWide = true;
     extraConfig = ''

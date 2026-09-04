@@ -13,6 +13,7 @@
     ../../services/postgres.nix
     ../../services/tpm.nix
 
+    ../../programs/ssh-tpm-agent.nix
     ../../programs/steam.nix
     ../../programs/sway.nix
   ];
@@ -38,11 +39,12 @@
     nmap
     unixtools.arp
     nil
-    nixfmt-rfc-style
+    nixfmt
     (pkgs.vscode-with-extensions.override {
-      vscode = pkgs.vscodium;
+      vscode = pkgs.code-cursor;
       vscodeExtensions = with pkgs.nix-vscode-extensions.open-vsx; [
         jnoortheen.nix-ide
+        golang.go
       ];
     })
   ];
