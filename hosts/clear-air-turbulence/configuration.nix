@@ -17,6 +17,15 @@
   xdg.sounds.enable = false;
   documentation.man.enable = false;
 
+  # Keep stub DNS; do not take UDP 5353 from librespot.
+  services.resolved = {
+    enable = true;
+    settings.Resolve = {
+      MulticastDNS = "no";
+      LLMNR = "no";
+    };
+  };
+
   imports = [
     self.inputs.disko.nixosModules.disko
     ./disk.nix

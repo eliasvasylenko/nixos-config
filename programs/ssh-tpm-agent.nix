@@ -1,12 +1,6 @@
-{ self, lib, pkgs, config, ... }:
+{ lib, pkgs, config, ... }:
 
 let
-  hostNames = builtins.attrNames (
-    lib.filterAttrs (_: type: type == "directory") (builtins.readDir (self + "/hosts"))
-  );
-  hostAliases = lib.concatMapStringsSep " " (
-    name: "${name} ${name}.lan.vasylenko.uk"
-  ) hostNames;
   pkcs11 = "/run/current-system/sw/lib/libtpm2_pkcs11.so";
   pkcs11Lib = "${config.security.tpm2.pkcs11.package}/lib";
   pkcs11StoreFiles = map (name: "${pkcs11Lib}/${name}") (
@@ -20,7 +14,7 @@ let
 in
 {
   programs.ssh.extraConfig = ''
-    Host ${hostAliases}
+    Host *.lan.vasylenko.uk
       ForwardAgent yes
   '';
 

@@ -1,13 +1,13 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   security.tpm2 = {
     enable = true;
     pkcs11 = {
       enable = true;
     };
-    abrmd.enable = true;
+    abrmd.enable = lib.mkDefault true;
     tctiEnvironment.enable = true;
-    tctiEnvironment.interface = "tabrmd";
+    tctiEnvironment.interface = lib.mkDefault "tabrmd";
   };
 
   environment.systemPackages = with pkgs; [

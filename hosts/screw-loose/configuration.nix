@@ -49,6 +49,9 @@
     })
   ];
 
+  # Receive mDNS so Spotify can see Connect receivers on the LAN.
+  networking.firewall.allowedUDPPorts = [ 5353 ];
+
   services.libinput.enable = true;
 
   system.stateVersion = "22.11";
