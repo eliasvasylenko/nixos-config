@@ -1,4 +1,4 @@
-{ self, ... }:
+{ self, lib, pkgs, ... }:
 
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -6,6 +6,19 @@
   boot.kernelParams = [ "nomodeset" "text" ];
   boot.tmp.cleanOnBoot = true;
   boot.loader.systemd-boot.configurationLimit = 3;
+  # Wyse NVRAM is ~256K and already holds PK/KEK/db/dbx. Stop bootctl
+  # adding duplicate VenHw Linux Boot Manager entries on every switch.
+  boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
+  boot.loader.systemd-boot.extraInstallCommands = ''
+    ${pkgs.efibootmgr}/bin/efibootmgr -v | ${pkgs.gawk}/bin/awk '
+      /^Boot[0-9A-Fa-f]{4}/ {
+        id = substr($1, 5, 4)
+        if ($0 ~ /99e275e7-75a0-4b37-a2e6-c5385e6c00cb/) print id
+      }
+    ' | while read -r id; do
+      ${pkgs.efibootmgr}/bin/efibootmgr -B -b "$id" || true
+    done
+  '';
   # Root is on eMMC. generate-config put sdhci_* in availableKernelModules
   # (udev can load them) but omitted mmc_block, so the initrd never created
   # mmcblk1.
