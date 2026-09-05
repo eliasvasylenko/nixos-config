@@ -49,8 +49,9 @@
   networking.firewall.allowedUDPPorts = [ 5353 ];
 
   # IQ Engine drops Bonjour with IP TTL 1 (drop-bonjour-ttl-1) when
-  # bridging eth0 backhaul to Wi-Fi. RFC 6762 requires TTL 1; STAs still
-  # accept a higher TTL, which is the only way past that hard-coded drop.
+  # bridging eth0 backhaul to Wi-Fi. libmdns sends TTL 1; RFC 6762
+  # §11 says responses SHOULD use IP TTL 255 (legacy queriers check
+  # that). 224.0.0.251 / ff02::fb are still not routed.
   boot.kernelModules = [ "xt_HL" ];
   networking.firewall.extraCommands = ''
     iptables -w -t mangle -C OUTPUT -p udp --dport 5353 -d 224.0.0.251 -j TTL --ttl-set 255 2>/dev/null ||
