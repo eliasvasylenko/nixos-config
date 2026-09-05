@@ -2,6 +2,9 @@
 {
   services.bind = {
     enable = true;
+    # named-checkconf runs in the sandbox and cannot see the TSIG
+    # files LoadCredential mounts at /var/lib/bind/creds.
+    checkConfig = false;
     forward = "first";
     forwarders = [ "1.1.1.1" "9.9.9.9" ];
     cacheNetworks = [ "127.0.0.0/24" "::1/128" "192.168.10.0/24" ];
@@ -40,37 +43,32 @@
       };
     '';
   };
-  systemd.services.bind.serviceConfig.ExecStartPre = [
-    "${pkgs.coreutils}/bin/mkdir -p /run/named/zones"
-    "${pkgs.coreutils}/bin/cp -n ${pkgs.writeText "zone-vasylenko.uk" ''
-      $ORIGIN vasylenko.uk.
-      $TTL    1h
-      @            IN      SOA     ns1 eli (
-                                        1    ; Serial
-                                        3h   ; Refresh
-                                        1h   ; Retry
-                                        1w   ; Expire
-                                        1h)  ; Negative Cache TTL
-                    IN      NS      ns1
-                    IN      A       192.168.10.1
+  systemd.services.bind.serviceConfig = {
+    ExecStartPre = [
+      "${pkgs.coreutils}/bin/mkdir -p /run/named/zones"
+      "${pkgs.coreutils}/bin/cp -n ${pkgs.writeText "zone-vasylenko.uk" ''
+        $ORIGIN vasylenko.uk.
+        $TTL    1h
+        @            IN      SOA     ns1 eli (
+                                          1    ; Serial
+                                          3h   ; Refresh
+                                          1h   ; Retry
+                                          1w   ; Expire
+                                          1h)  ; Negative Cache TTL
+                      IN      NS      ns1
+                      IN      A       192.168.10.1
 
-      ns1          IN      A       192.168.10.1
+        ns1          IN      A       192.168.10.1
 
-      $ORIGIN lan.vasylenko.uk.
-      @            IN      NS      ns1.vasylenko.uk.
-    ''} /run/named/zones/zone-vasylenko.uk"
-  ];
-  secret-agent.keys."bind/determinist-rfc2136" = {
-    generate = [ "${pkgs.bind}/bin/tsig-keygen" "-ahmac-sha512" "rfc2136" ];
-    # Update bind in nixpkgs to `import` from an arbitrary list of creds
-    systemd.bind = {
-      enable = true;
-      bindPath = "/var/lib/bind/creds/";
-    };
-    systemd.caddy = {
-      enable = true;
-      bindPath = "/var/lib/caddy/creds/rfc2136";
-    };
+        $ORIGIN lan.vasylenko.uk.
+        @            IN      NS      ns1.vasylenko.uk.
+      ''} /run/named/zones/zone-vasylenko.uk"
+    ];
+    BindPaths = [ "%d:/var/lib/bind/creds" ];
+    LoadCredentialEncrypted = [
+      "just-passing-through-rfc2136:/etc/credstore.encrypted/just-passing-through-rfc2136.cred"
+      "determinist-rfc2136:/etc/credstore.encrypted/determinist-rfc2136.cred"
+    ];
   };
 
   services.dnsmasq = {

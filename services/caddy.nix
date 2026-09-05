@@ -2,7 +2,17 @@
   pkgs,
   config,
   ...
-}: {
+}:
+let
+  # TSIG key names still match the pre-rename hostnames in credstore.
+  tsigName =
+    {
+      eager-beaver = "just-passing-through";
+      little-donkey = "determinist";
+    }
+    .${config.networking.hostName} or config.networking.hostName;
+in
+{
   services.caddy = {
     enable = true;
     logFormat = ''
@@ -23,14 +33,14 @@
       acme_ca https://ca.vasylenko.uk/acme/acme/directory
       acme_ca_root ${../system/certs/root_ca.crt}
       acme_dns rfc2136 {
-        key_name "${config.networking.hostName}.lan.vasylenko.uk"
+        key_name "${tsigName}.lan.vasylenko.uk"
         key_alg "hmac-sha512"
-        key "{file.${config.secret-agent.keys."bind/${config.networking.hostName}-rfc2136".systemd.bindpath}}"
+        key "{file./var/lib/caddy/creds/rfc2136}"
         server "ns1.vasylenko.uk:53"
       }
       dynamic_dns {
         provider rfc2136 {
-          key_name "${config.networking.hostName}.lan.vasylenko.uk"
+          key_name "${tsigName}.lan.vasylenko.uk"
           key_alg "hmac-sha512"
           key "{file./var/lib/caddy/creds/rfc2136}"
           server "ns1.vasylenko.uk:53"
@@ -51,17 +61,6 @@
     LoadCredentialEncrypted = [
       "rfc2136:/etc/credstore.encrypted/rfc2136.cred"
     ];
-  };
-
-  secret-agent.keys."bind/${config.networking.hostName}-rfc2136" = {
-    generate = [ "${pkgs.bind}/bin/tsig-keygen" "-ahmac-sha512" "rfc2136" ];
-    systemd.caddy = {
-      enable = true;
-      bindPath = "/var/lib/caddy/creds/rfc2136";
-    };
-    remote."just-passing-through" = {
-      enable = true;
-    };
   };
 
   # TODO systemd.services.caddy.serviceConfig.ProtectSystem = "strict";
