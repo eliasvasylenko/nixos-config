@@ -1,7 +1,9 @@
-{ ... }:
+{ self, ... }:
 
 {
   imports = [
+    self.inputs.disko.nixosModules.disko
+    ./disk.nix
     ./hardware-configuration.nix
 
     ../../users/eli.nix

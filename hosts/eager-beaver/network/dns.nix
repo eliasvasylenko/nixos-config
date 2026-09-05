@@ -83,7 +83,14 @@
 
       cache-size = 100;
 
-      dhcp-range = [ "lan,192.168.10.50,192.168.10.254,24h" ];
+      # Only DHCP server on this LAN. Short leases so a hostname
+      # (busy-bee on wifi, then ethernet, then a reused address) does
+      # not stick to a dead MAC for a day. dnsmasq gives the name to
+      # the last client that sent it; the installer has three NICs.
+      dhcp-authoritative = true;
+      dhcp-range = [ "lan,192.168.10.50,192.168.10.254,1h" ];
+      # Default is already 0; keep it explicit so BIND/resolved re-query.
+      dhcp-ttl = 0;
       interface = [ "lan" "lo" ];
       dhcp-host = [ "192.168.10.1" ];
       dhcp-option = [ "6,192.168.10.1" ];
