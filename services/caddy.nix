@@ -20,10 +20,11 @@ in
     '';
     package = (pkgs.caddy.withPlugins {
       plugins = [
-        "github.com/caddy-dns/rfc2136@v0.1.2"
-        "github.com/eliasvasylenko/caddy-dynamicdns@v0.0.0-20250227123441-95b5f2944cac"
+        # v0.1.2 still uses the old libdns.Record struct
+        "github.com/caddy-dns/rfc2136@v1.0.1-0.20250502132027-e50b9f25dd68"
+        "github.com/mholt/caddy-dynamicdns@v0.0.0-20260805195708-67d107a42c02"
       ];
-      hash = "sha256-5RsLgnT7Xuf1B3Wfkw7SeBIJbTqismQW43oxG3V9jRA=";
+      hash = "sha256-urC33IjpESGjxVS1+mYJmjgbGDTcStF0RKJl4pBk4JA=";
     });
     globalConfig = ''
       email eli@vasylenko.uk
@@ -46,7 +47,7 @@ in
           server "ns1.vasylenko.uk:53"
         }
         ip_source interface lan
-        includes 192.168.10.0/24
+        include 192.168.10.0/24
         ttl 1h
     		check_interval 5m
         domains {
