@@ -41,7 +41,21 @@
     nil
     nixfmt
     (pkgs.vscode-with-extensions.override {
-      vscode = pkgs.code-cursor;
+      # helpers/node is a non-PIE Node binary. patchelf leaves .dynamic inside a
+      # read-only LOAD segment, so ld-linux segfaults and the canvas service dies.
+      # Replace it with Nix's Node 24. This Cursor release ships Node 24.
+      vscode = pkgs.code-cursor.overrideAttrs (old: {
+        postFixup = (old.postFixup or "") + ''
+          helper="$out/lib/cursor/resources/app/resources/helpers/node"
+          if [[ ! -f $helper ]]; then
+            echo "cursor node helper missing at $helper" >&2
+            exit 1
+          fi
+          rm -f "$helper"
+          printf '%s\n' '#!${pkgs.runtimeShell}' 'exec ${pkgs.nodejs_24}/bin/node "$@"' > "$helper"
+          chmod +x "$helper"
+        '';
+      });
       vscodeExtensions = with pkgs.nix-vscode-extensions.open-vsx; [
         jnoortheen.nix-ide
         golang.go
