@@ -33,6 +33,10 @@
 
   networking.firewall.allowedTCPPorts = [ 80 443 ];
 
+  services.caddy.virtualHosts."video.vasylenko.uk".extraConfig = ''
+    reverse_proxy snoopy-badger.lan.vasylenko.uk
+  '';
+
   # the following seems to be necessary for some reason to turn TPM off, otherwise the system will try to start with it but the hardware is not present...
   systemd.tpm2.enable = false;
   boot.initrd.systemd.tpm2.enable = false;
