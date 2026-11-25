@@ -12,8 +12,10 @@
       include "/var/lib/bind/creds/*";
 
       controls {
-        inet 192.168.10.1 allow { cachenetworks; } keys { "just-passing-through.lan.vasylenko.uk"; };
-        inet 192.168.10.1 allow { cachenetworks; } keys { "determinist.lan.vasylenko.uk"; };
+        inet 192.168.10.1 allow { cachenetworks; } keys {
+          "just-passing-through.lan.vasylenko.uk";
+          "determinist.lan.vasylenko.uk";
+        };
       };
 
       zone "vasylenko.uk" {
@@ -90,7 +92,11 @@
       # Default is already 0; keep it explicit so BIND/resolved re-query.
       dhcp-ttl = 0;
       interface = [ "lan" "lo" ];
-      dhcp-host = [ "192.168.10.1" ];
+      dhcp-host = [
+        "192.168.10.1"
+        "c4:aa:c4:18:b7:ec,peepy-owl"
+        "ec:71:db:8a:17:8d,chirpy-robin"
+      ];
       dhcp-option = [ "6,192.168.10.1" ];
 
       local = "/lan.vasylenko.uk/";
